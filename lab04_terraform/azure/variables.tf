@@ -1,6 +1,6 @@
 # replace the X with your student ID
 variable "studentID" {
-  default = "X"
+  default = "15"
 }
 
 variable "azure_machine_type" {
