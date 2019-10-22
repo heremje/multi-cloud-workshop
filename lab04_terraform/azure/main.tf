@@ -4,14 +4,14 @@ provider "azurerm" {
 resource "azurerm_public_ip" "myterraformpublicip" {
     name                         = "terraform-multicloud-ip-student${var.studentID}"
     location                     = "${var.location}"
-    resource_group_name          = "multi-cloud-workshop-pxl-${var.studentID}"
+    resource_group_name          = "multicloud-workshop-${var.studentID}"
     allocation_method            = "Static"
 }
 
 resource "azurerm_network_security_group" "myterraformnsg" {
     name                = "terraform-multicloud-secgroup-student${var.studentID}"
     location            = "${var.location}"
-    resource_group_name = "multi-cloud-workshop-pxl-${var.studentID}"
+    resource_group_name = "multicloud-workshop-${var.studentID}"
     
     security_rule {
         name                       = "SSH"
@@ -41,7 +41,7 @@ resource "azurerm_network_security_group" "myterraformnsg" {
 resource "azurerm_network_interface" "myterraformnic" {
     name                = "terraform-multicloud-nic-student${var.studentID}"
     location            = "${var.location}"
-    resource_group_name = "multi-cloud-workshop-pxl-${var.studentID}"
+    resource_group_name = "multicloud-workshop-${var.studentID}"
     network_security_group_id = "${azurerm_network_security_group.myterraformnsg.id}"
 
     ip_configuration {
@@ -55,7 +55,7 @@ resource "azurerm_network_interface" "myterraformnic" {
 resource "azurerm_virtual_machine" "myterraformvm" {
     name                  = "terraform-instance-azure-student${var.studentID}"
     location              = "${var.location}"
-    resource_group_name   = "multi-cloud-workshop-pxl-${var.studentID}"
+    resource_group_name   = "multicloud-workshop-${var.studentID}"
     network_interface_ids = ["${azurerm_network_interface.myterraformnic.id}"]
     vm_size               = "${var.azure_machine_type}"
 
@@ -77,7 +77,7 @@ resource "azurerm_virtual_machine" "myterraformvm" {
     os_profile {
         computer_name  = "terraform-instance-azure-student${var.studentID}"
         admin_username = "ubuntu"
-        custom_data    = file("cloud-config.txt")
+        custom_data    = file("cloud-init.yaml")
     }
 
     os_profile_linux_config {
@@ -96,13 +96,13 @@ resource "azurerm_virtual_machine" "myterraformvm" {
 
 data "azurerm_public_ip" "test" {
   name                = "${azurerm_public_ip.myterraformpublicip.name}"
-  resource_group_name = "multi-cloud-workshop-pxl-${var.studentID}"
+  resource_group_name = "multicloud-workshop-${var.studentID}"
 }
 
 resource "azurerm_dns_a_record" "myterraformdns" {
   name                = "${var.studentID}.tf"
   zone_name           = "azure.gluo.cloud"
-  resource_group_name = "multi-cloud-workshop"
+  resource_group_name = "multicloud-workshop"
   ttl                 = 60
   records             = ["${data.azurerm_public_ip.test.ip_address}"]
 }
